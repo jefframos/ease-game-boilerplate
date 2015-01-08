@@ -1,4 +1,4 @@
-/*! jefframos 07-01-2015 */
+/*! jefframos 08-01-2015 */
 function rgbToHsl(r, g, b) {
     r /= 255, g /= 255, b /= 255;
     var h, s, max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
@@ -78,7 +78,7 @@ function radiansToDegrees(rad) {
 }
 
 function testMobile() {
-    return !1;
+    return !0;
 }
 
 function update() {
@@ -323,6 +323,25 @@ var Application = AbstractApplication.extend({
     destroy: function() {
         this._super();
     }
+}), Red = SpritesheetEntity.extend({
+    init: function() {
+        this._super(!0);
+    },
+    build: function() {
+        var self = this, motionIdle = new SpritesheetAnimation();
+        motionIdle.build("idle", this.getFramesByRange("redEnemy10", 0, 12), 1, !0, null);
+        var motionHurt = new SpritesheetAnimation();
+        motionHurt.build("hurt", this.getFramesByRange("redEnemy10", 13, 19), 1, !1, function() {
+            self.spritesheet.play("idle");
+        }), this.spritesheet = new Spritesheet(), this.spritesheet.addAnimation(motionIdle), 
+        this.spritesheet.addAnimation(motionHurt), this.spritesheet.play("idle");
+    },
+    update: function() {
+        this._super();
+    },
+    destroy: function() {
+        this._super();
+    }
 }), AppModel = Class.extend({
     init: function() {
         this.id = 0;
@@ -339,46 +358,33 @@ var Application = AbstractApplication.extend({
     },
     build: function() {
         this._super();
-        var assetsToLoader = [ "_dist/img/ease.png", "_dist/img/UI/simpleButtonOver.png", "_dist/img/UI/simpleButtonUp.png", "_dist/img/spritesheet/cupcake.json" ];
+        var assetsToLoader = [ "_dist/img/ease.png", "_dist/img/UI/simpleButtonOver.png", "_dist/img/spritesheet/red/red.json", "_dist/img/UI/simpleButtonUp.png" ];
         assetsToLoader.length > 0 ? (this.loader = new PIXI.AssetLoader(assetsToLoader), 
         this.initLoad()) : this.onAssetsLoaded();
     },
+    onProgress: function() {
+        this._super();
+    },
     onAssetsLoaded: function() {
-        this._super(), this.easeImg = new SimpleSprite("_dist/img/ease.png"), this.addChild(this.easeImg), 
-        this.easeImg.setPosition(50, 50), this.cupcake = new Cupcake(), this.cupcake.build(), 
-        this.addChild(this.cupcake), this.cupcake.setPosition(windowWidth / 2, windowHeight / 2), 
-        this.cupcake.setScale(.8, .8);
+        this.initApplication();
+    },
+    initApplication: function() {
+        this.easeImg = new SimpleSprite("_dist/img/ease.png"), this.addChild(this.easeImg), 
+        this.easeImg.setPosition(50, 50), this.red = new Red(), this.red.build(), this.addChild(this.red), 
+        this.red.setPosition(windowWidth / 2, windowHeight / 2), this.red.setScale(.8, .8);
         var self = this;
         this.buttonIdle = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
         this.buttonIdle.build(), this.buttonIdle.setPosition(50, windowHeight / 2), this.addChild(this.buttonIdle), 
         this.buttonIdle.addLabel(new PIXI.Text("idle", {
             font: "20px Arial"
         }), 5, 5), this.buttonIdle.clickCallback = function() {
-            self.cupcake.spritesheet.play("idle");
-        }, this.buttonRun = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
-        this.buttonRun.build(), this.buttonRun.setPosition(50, windowHeight / 2 + 60), this.addChild(this.buttonRun), 
-        this.buttonRun.addLabel(new PIXI.Text("run", {
-            font: "20px Arial"
-        }), 5, 5), this.buttonRun.clickCallback = function() {
-            self.cupcake.spritesheet.play("run");
-        }, this.buttonPounch = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
-        this.buttonPounch.build(), this.buttonPounch.setPosition(50, windowHeight / 2 + 120), 
-        this.addChild(this.buttonPounch), this.buttonPounch.addLabel(new PIXI.Text("pounch", {
-            font: "20px Arial"
-        }), 5, 5), this.buttonPounch.clickCallback = function() {
-            self.cupcake.spritesheet.play("pounch");
-        }, this.buttonThrow = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
-        this.buttonThrow.build(), this.buttonThrow.setPosition(50, windowHeight / 2 + 180), 
-        this.addChild(this.buttonThrow), this.buttonThrow.addLabel(new PIXI.Text("throw", {
-            font: "20px Arial"
-        }), 5, 5), this.buttonThrow.clickCallback = function() {
-            self.cupcake.spritesheet.play("throw");
+            self.red.spritesheet.play("idle");
         }, this.buttonHurt = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
-        this.buttonHurt.build(), this.buttonHurt.setPosition(50, windowHeight / 2 + 240), 
+        this.buttonHurt.build(), this.buttonHurt.setPosition(50, windowHeight / 2 + 60), 
         this.addChild(this.buttonHurt), this.buttonHurt.addLabel(new PIXI.Text("hurt", {
             font: "20px Arial"
         }), 5, 5), this.buttonHurt.clickCallback = function() {
-            self.cupcake.spritesheet.play("hurt");
+            self.red.spritesheet.play("hurt");
         };
     }
 }), FirebaseSocket = SmartSocket.extend({
@@ -444,7 +450,8 @@ var Application = AbstractApplication.extend({
     }
 }), meter = new FPSMeter(), resizeProportional = !0, windowWidth = 820, windowHeight = 600, realWindowWidth = 820, realWindowHeight = 600;
 
-testMobile() && (windowWidth = 640, windowHeight = 960);
+testMobile() && (windowWidth = 640, windowHeight = 960, realWindowWidth = windowWidth, 
+realWindowHeight = windowHeight);
 
 var renderer, windowWidthVar = window.innerWidth, windowHeightVar = window.innerHeight, renderer = PIXI.autoDetectRenderer(realWindowWidth, realWindowHeight, null, !1, !0);
 

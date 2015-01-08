@@ -1,7 +1,7 @@
 /*jshint undef:false */
 var meter = new FPSMeter();
 function testMobile() {
-	return false;// Modernizr.touch || window.innerWidth < 600;
+	return true;// Modernizr.touch || window.innerWidth < 600;
 }
 var resizeProportional = true;
 var windowWidth = 820,
@@ -13,6 +13,9 @@ realWindowHeight = 600;
 if(testMobile()){
 	windowWidth = 640;
 	windowHeight = 960;
+
+	realWindowWidth = windowWidth;
+	realWindowHeight = windowHeight;
 }
 var renderer;
 var windowWidthVar = window.innerWidth,

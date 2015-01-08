@@ -1,4 +1,4 @@
-/*! jefframos 07-01-2015 */
+/*! jefframos 08-01-2015 */
 !function(m, j) {
     function s(a, e) {
         for (var g in e) try {
@@ -4841,8 +4841,9 @@ var DefaultButton = Class.extend({
         };
     },
     addLabel: function(text, marginX, marginY, autoAlign, acressX, acressY) {
-        if (this.container.addChild(text), text.position.x = this.shapeButton.position.x, 
-        text.position.y = this.shapeButton.position.y, autoAlign) {
+        if (this.container.addChild(text), marginX || (marginX = 0), marginY || (marginY = 0), 
+        text.position.x = this.shapeButton.position.x, text.position.y = this.shapeButton.position.y, 
+        autoAlign) {
             var scaleFactorX = (this.shapeButton.width - 2 * marginX) / text.width, scaleFactorY = (this.shapeButton.height - 2 * marginY) / text.height;
             scaleFactorY > scaleFactorX ? scaleFactorY = scaleFactorX : scaleFactorX = scaleFactorY, 
             text.width *= scaleFactorX, text.height *= scaleFactorY, text.position.x = this.shapeButton.position.x + this.shapeButton.width / 2 - text.width / 2 + acressX, 
@@ -5127,17 +5128,23 @@ var DefaultButton = Class.extend({
         this.canvasArea = {
             x: 0,
             y: 0
-        }, this.loader, this.loadPercent, this.loadText = new PIXI.Text("0%", {
-            font: "20px Luckiest Guy",
-            fill: "black",
-            align: "center"
-        }), this.container.addChild(this.loadText), this.loadText.position.x = this.canvasWidth / 2 - this.loadText.width / 2, 
-        this.loadText.position.y = this.canvasHeight / 2 - this.loadText.height / 2;
+        }, this.loader, this.loadPercent, this.JSONloader, this.JSONloadPercent, this.jsonLoaded = !0, 
+        this.assetsLoaded = !0;
+    },
+    initJSONLoad: function() {
+        this.jsonLoaded = !1;
+        var that = this;
+        this.JSONloader.onComplete = function() {
+            that.jsonLoaded = !0, that.onJSONLoaded();
+        }, this.JSONloader.onProgress = function() {
+            that.onProgress();
+        }, this.JSONloader.load();
     },
     initLoad: function() {
+        this.assetsLoaded = !1;
         var that = this;
         this.loader.onComplete = function() {
-            that.onAssetsLoaded();
+            that.assetsLoaded = !0, that.onAssetsLoaded();
         }, this.loader.onProgress = function() {
             that.onProgress();
         }, this.loader.load();
@@ -5148,16 +5155,10 @@ var DefaultButton = Class.extend({
     getContent: function() {
         return this.container;
     },
-    onAssetsLoaded: function() {
-        this.container.removeChild(this.loadText);
-    },
+    onJSONLoaded: function() {},
+    onAssetsLoaded: function() {},
     onProgress: function() {
-        this.loadPercent = (this.loader.assetURLs.length - this.loader.loadCount) / this.loader.assetURLs.length, 
-        this.loadText.parent && this.container.removeChild(this.loadText), this.loadText = new PIXI.Text(Math.floor(100 * this.loadPercent) + "%", {
-            fill: "black",
-            align: "center"
-        }), this.container.addChild(this.loadText), this.loadText.position.x = this.canvasArea.x / 2 - this.loadText.width / 2, 
-        this.loadText.position.y = this.canvasArea.y / 2 - this.loadText.height / 2;
+        this.loadPercent = (this.loader.assetURLs.length - this.loader.loadCount) / this.loader.assetURLs.length;
     },
     addChild: function(child) {
         this.childs.push(child), this.container.addChild(void 0 != child.getContent ? child.getContent() : child);

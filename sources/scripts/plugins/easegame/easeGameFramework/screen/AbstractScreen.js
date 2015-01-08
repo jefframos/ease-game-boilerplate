@@ -12,19 +12,40 @@ var AbstractScreen = Class.extend({
 
 		this.loader;
 		this.loadPercent;
-		this.loadText = new PIXI.Text("0%", {font:"20px Luckiest Guy", fill:"black", align:"center"});;
-		this.container.addChild(this.loadText);
-		this.loadText.position.x = this.canvasWidth/2 - this.loadText.width/2;
-		this.loadText.position.y = this.canvasHeight/2 - this.loadText.height/2;
 
+		this.JSONloader;
+		this.JSONloadPercent;
 
+		// this.loadText = new PIXI.Text("0%", {font:"20px Luckiest Guy", fill:"black", align:"center"});;
+		// this.container.addChild(this.loadText);
+		// this.loadText.position.x = this.canvasWidth/2 - this.loadText.width/2;
+		// this.loadText.position.y = this.canvasHeight/2 - this.loadText.height/2;
 
+		this.jsonLoaded = true;
+        this.assetsLoaded = true;
+
+	},
+	//inicia o carregamento dos assets
+	initJSONLoad:function()
+	{		
+		this.jsonLoaded = false;
+		var that = this;
+		this.JSONloader.onComplete = function() {
+			that.jsonLoaded = true;
+			that.onJSONLoaded();
+		};
+		this.JSONloader.onProgress = function() {
+			that.onProgress();
+		};
+		this.JSONloader.load();
 	},
 	//inicia o carregamento dos assets
 	initLoad:function()
 	{		
+		this.assetsLoaded = false;
 		var that = this;
 		this.loader.onComplete = function() {
+			that.assetsLoaded = true;
 			that.onAssetsLoaded();
 		};
 		this.loader.onProgress = function() {
@@ -41,20 +62,23 @@ var AbstractScreen = Class.extend({
 		return this.container;
 	},
 	//evento chamado quando os assets forem carregados
+	onJSONLoaded:function(){
+
+	},
 	onAssetsLoaded:function()
 	{
-		this.container.removeChild(this.loadText);
+		// this.container.removeChild(this.loadText);
 	},
 	//onProgress do loader
 	onProgress:function()
 	{
 		this.loadPercent = ((this.loader.assetURLs.length - this.loader.loadCount) / this.loader.assetURLs.length);
-		if(this.loadText.parent)
-			this.container.removeChild(this.loadText);
-		this.loadText = new PIXI.Text(Math.floor(this.loadPercent* 100) + "%", {fill:"black", align:"center"});;
-		this.container.addChild(this.loadText);
-		this.loadText.position.x = this.canvasArea.x/2 - this.loadText.width/2;
-		this.loadText.position.y = this.canvasArea.y/2 - this.loadText.height/2;
+		// if(this.loadText.parent)
+		// 	this.container.removeChild(this.loadText);
+		// this.loadText = new PIXI.Text(Math.floor(this.loadPercent* 100) + "%", {fill:"black", align:"center"});;
+		// this.container.addChild(this.loadText);
+		// this.loadText.position.x = this.canvasArea.x/2 - this.loadText.width/2;
+		// this.loadText.position.y = this.canvasArea.y/2 - this.loadText.height/2;
 
 	},
 	//adiciona uma entidade no palco
