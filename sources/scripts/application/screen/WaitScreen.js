@@ -45,20 +45,28 @@ var WaitScreen = AbstractScreen.extend({
 
         var self = this;
         this.buttonHurt = new DefaultButton('_dist/img/UI/simpleButtonUp.png', '_dist/img/UI/simpleButtonOver.png');
-        this.buttonHurt.build();
+        this.buttonHurt.build(130);
         this.buttonHurt.setPosition( 50,windowHeight/2 + 60);
         this.addChild(this.buttonHurt);
-        this.buttonHurt.addLabel(new PIXI.Text('hurt', {font:'20px Arial'}),5,5);
+        this.buttonHurt.addLabel(new PIXI.Text('Hurt', {font:'20px Arial'}),5,5);
         this.buttonHurt.clickCallback = function(){
             self.red.spritesheet.play('hurt');
-            // fullscreen();
+        };
+
+        this.fullScreen = new DefaultButton('_dist/img/UI/simpleButtonUp.png', '_dist/img/UI/simpleButtonOver.png');
+        this.fullScreen.build(130);
+        this.fullScreen.setPosition( 50,windowHeight/2 + 120);
+        this.addChild(this.fullScreen);
+        this.fullScreen.addLabel(new PIXI.Text('Full Screen', {font:'20px Arial'}),5,5);
+        this.fullScreen.clickCallback = function(){
+            fullscreen();
         };
 
         this.add = new DefaultButton('_dist/img/UI/simpleButtonUp.png', '_dist/img/UI/simpleButtonOver.png');
-        this.add.build();
-        this.add.setPosition( 50,windowHeight/2 + 90);
+        this.add.build(130);
+        this.add.setPosition( 50,windowHeight/2 + 180);
         this.addChild(this.add);
-        this.add.addLabel(new PIXI.Text('addEntity', {font:'20px Arial'}),5,5);
+        this.add.addLabel(new PIXI.Text('Add Entity', {font:'20px Arial'}),5,5);
         this.add.clickCallback = function(){
             var red = new Red();
             red.build();
