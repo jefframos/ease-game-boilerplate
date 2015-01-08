@@ -1,7 +1,7 @@
 /*jshint undef:false */
 var meter = new FPSMeter();
 function testMobile() {
-	return true;// Modernizr.touch || window.innerWidth < 600;
+	return Modernizr.touch;// || window.innerWidth < 600;//true;// Modernizr.touch || window.innerWidth < 600;
 }
 var resizeProportional = true;
 var windowWidth = 820,
@@ -28,6 +28,8 @@ var APP;
 APP = new Application();
 APP.build();
 APP.show();
+
+console.log(Modernizr);
 
 function update() {
 	requestAnimFrame(update );
@@ -58,6 +60,23 @@ var initialize = function(){
 	PIXI.BaseTexture.SCALE_MODE = 2;
 	requestAnimFrame(update);
 };
+
+function fullscreen(){
+
+	var elem = renderer.view;//document.getElementById('myvideo');
+	if (elem.requestFullscreen) {
+		elem.requestFullscreen();
+	} else if (elem.msRequestFullscreen) {
+		elem.msRequestFullscreen();
+	} else if (elem.mozRequestFullScreen) {
+		elem.mozRequestFullScreen();
+	} else if (elem.webkitRequestFullscreen) {
+		elem.webkitRequestFullscreen();
+	}
+}
+
+
+
 
 (function () {
 	var App = {

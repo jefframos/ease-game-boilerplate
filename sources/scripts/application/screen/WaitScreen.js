@@ -51,6 +51,21 @@ var WaitScreen = AbstractScreen.extend({
         this.buttonHurt.addLabel(new PIXI.Text('hurt', {font:'20px Arial'}),5,5);
         this.buttonHurt.clickCallback = function(){
             self.red.spritesheet.play('hurt');
+            // fullscreen();
+        };
+
+        this.add = new DefaultButton('_dist/img/UI/simpleButtonUp.png', '_dist/img/UI/simpleButtonOver.png');
+        this.add.build();
+        this.add.setPosition( 50,windowHeight/2 + 90);
+        this.addChild(this.add);
+        this.add.addLabel(new PIXI.Text('addEntity', {font:'20px Arial'}),5,5);
+        this.add.clickCallback = function(){
+            var red = new Red();
+            red.build();
+            red.setPosition(0, windowHeight * Math.random());
+            self.addChild(red);
+            red.velocity.x = 1;
+            // fullscreen();
         };
     }
 });

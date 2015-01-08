@@ -78,7 +78,7 @@ function radiansToDegrees(rad) {
 }
 
 function testMobile() {
-    return !0;
+    return Modernizr.touch;
 }
 
 function update() {
@@ -88,6 +88,11 @@ function update() {
     windowWidthVar > realWindowWidth && (windowWidthVar = realWindowWidth), windowHeightVar > realWindowHeight && (windowHeightVar = realWindowHeight), 
     renderer.view.style.width = windowWidthVar + "px", renderer.view.style.height = windowHeightVar + "px", 
     APP.update(), renderer.render(APP.stage), meter.tick();
+}
+
+function fullscreen() {
+    var elem = renderer.view;
+    elem.requestFullscreen ? elem.requestFullscreen() : elem.msRequestFullscreen ? elem.msRequestFullscreen() : elem.mozRequestFullScreen ? elem.mozRequestFullScreen() : elem.webkitRequestFullscreen && elem.webkitRequestFullscreen();
 }
 
 var DungeonGenerator = Class.extend({
@@ -329,15 +334,15 @@ var Application = AbstractApplication.extend({
     },
     build: function() {
         var self = this, motionIdle = new SpritesheetAnimation();
-        motionIdle.build("idle", this.getFramesByRange("redEnemy10", 0, 12), 1, !0, null);
+        motionIdle.build("idle", this.getFramesByRange("red0", 1, 26), 1, !0, null);
         var motionHurt = new SpritesheetAnimation();
-        motionHurt.build("hurt", this.getFramesByRange("redEnemy10", 13, 19), 1, !1, function() {
+        motionHurt.build("hurt", this.getFramesByRange("red0", 28, 43), 1, !1, function() {
             self.spritesheet.play("idle");
         }), this.spritesheet = new Spritesheet(), this.spritesheet.addAnimation(motionIdle), 
         this.spritesheet.addAnimation(motionHurt), this.spritesheet.play("idle");
     },
     update: function() {
-        this._super();
+        this._super(), this.getPosition().x > windowWidth && this.preKill();
     },
     destroy: function() {
         this._super();
@@ -379,6 +384,14 @@ var Application = AbstractApplication.extend({
             font: "20px Arial"
         }), 5, 5), this.buttonHurt.clickCallback = function() {
             self.red.spritesheet.play("hurt");
+        }, this.add = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
+        this.add.build(), this.add.setPosition(50, windowHeight / 2 + 90), this.addChild(this.add), 
+        this.add.addLabel(new PIXI.Text("addEntity", {
+            font: "20px Arial"
+        }), 5, 5), this.add.clickCallback = function() {
+            var red = new Red();
+            red.build(), red.setPosition(0, windowHeight * Math.random()), self.addChild(red), 
+            red.velocity.x = 1;
         };
     }
 }), FirebaseSocket = SmartSocket.extend({
@@ -453,7 +466,7 @@ document.body.appendChild(renderer.view);
 
 var APP;
 
-APP = new Application(), APP.build(), APP.show();
+APP = new Application(), APP.build(), APP.show(), console.log(Modernizr);
 
 var initialize = function() {
     PIXI.BaseTexture.SCALE_MODE = 2, requestAnimFrame(update);

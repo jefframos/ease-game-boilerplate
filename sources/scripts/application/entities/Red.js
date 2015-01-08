@@ -10,10 +10,10 @@ var Red = SpritesheetEntity.extend({
 
 		var self = this;
 		var motionIdle = new SpritesheetAnimation();
-		motionIdle.build('idle', this.getFramesByRange('redEnemy10', 0, 12), 1, true, null);
+		motionIdle.build('idle', this.getFramesByRange('red0', 1, 26), 1, true, null);
 		
 		var motionHurt = new SpritesheetAnimation();
-		motionHurt.build('hurt', this.getFramesByRange('redEnemy10', 13, 19), 1, false, function(){
+		motionHurt.build('hurt', this.getFramesByRange('red0', 28, 43), 1, false, function(){
 			self.spritesheet.play('idle');
 		});
 
@@ -25,6 +25,9 @@ var Red = SpritesheetEntity.extend({
 	},
 	update:function(){
 		this._super();
+		if(this.getPosition().x > windowWidth){
+			this.preKill();
+		}
 	},
 	destroy:function(){
 		this._super();
