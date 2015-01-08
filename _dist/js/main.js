@@ -371,15 +371,9 @@ var Application = AbstractApplication.extend({
     initApplication: function() {
         this.easeImg = new SimpleSprite("_dist/img/ease.png"), this.addChild(this.easeImg), 
         this.easeImg.setPosition(50, 50), this.red = new Red(), this.red.build(), this.addChild(this.red), 
-        this.red.setPosition(windowWidth / 2, windowHeight / 2), this.red.setScale(.8, .8);
+        this.red.setPosition(windowWidth / 2, windowHeight / 2);
         var self = this;
-        this.buttonIdle = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
-        this.buttonIdle.build(), this.buttonIdle.setPosition(50, windowHeight / 2), this.addChild(this.buttonIdle), 
-        this.buttonIdle.addLabel(new PIXI.Text("idle", {
-            font: "20px Arial"
-        }), 5, 5), this.buttonIdle.clickCallback = function() {
-            self.red.spritesheet.play("idle");
-        }, this.buttonHurt = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
+        this.buttonHurt = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
         this.buttonHurt.build(), this.buttonHurt.setPosition(50, windowHeight / 2 + 60), 
         this.addChild(this.buttonHurt), this.buttonHurt.addLabel(new PIXI.Text("hurt", {
             font: "20px Arial"
@@ -450,8 +444,8 @@ var Application = AbstractApplication.extend({
     }
 }), meter = new FPSMeter(), resizeProportional = !0, windowWidth = 820, windowHeight = 600, realWindowWidth = 820, realWindowHeight = 600;
 
-testMobile() && (windowWidth = 640, windowHeight = 960, realWindowWidth = windowWidth, 
-realWindowHeight = windowHeight);
+testMobile() && (windowWidth = window.innerWidth, windowHeight = window.innerHeight, 
+realWindowWidth = windowWidth, realWindowHeight = windowHeight);
 
 var renderer, windowWidthVar = window.innerWidth, windowHeightVar = window.innerHeight, renderer = PIXI.autoDetectRenderer(realWindowWidth, realWindowHeight, null, !1, !0);
 

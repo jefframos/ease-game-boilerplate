@@ -42,19 +42,8 @@ var WaitScreen = AbstractScreen.extend({
         this.red.build();
         this.addChild(this.red);
         this.red.setPosition(windowWidth / 2, windowHeight / 2);
-        this.red.setScale(0.8,0.8);
 
         var self = this;
-
-        this.buttonIdle = new DefaultButton('_dist/img/UI/simpleButtonUp.png', '_dist/img/UI/simpleButtonOver.png');
-        this.buttonIdle.build();
-        this.buttonIdle.setPosition( 50,windowHeight/2);
-        this.addChild(this.buttonIdle);
-        this.buttonIdle.addLabel(new PIXI.Text('idle', {font:'20px Arial'}),5,5);
-        this.buttonIdle.clickCallback = function(){
-            self.red.spritesheet.play('idle');
-        };
-
         this.buttonHurt = new DefaultButton('_dist/img/UI/simpleButtonUp.png', '_dist/img/UI/simpleButtonOver.png');
         this.buttonHurt.build();
         this.buttonHurt.setPosition( 50,windowHeight/2 + 60);

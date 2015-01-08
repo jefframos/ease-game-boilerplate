@@ -11,8 +11,8 @@ var realWindowWidth = 820,
 realWindowHeight = 600;
 
 if(testMobile()){
-	windowWidth = 640;
-	windowHeight = 960;
+	windowWidth = window.innerWidth;//640;
+	windowHeight = window.innerHeight;//960;
 
 	realWindowWidth = windowWidth;
 	realWindowHeight = windowHeight;
