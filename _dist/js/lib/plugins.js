@@ -1,4 +1,4 @@
-/*! jefframos 08-01-2015 */
+/*! jefframos 09-01-2015 */
 !function(m, j) {
     function s(a, e) {
         for (var g in e) try {
@@ -4388,7 +4388,26 @@
     };
 }(this, document), Modernizr.load = function() {
     yepnope.apply(window, [].slice.call(arguments, 0));
-}, function() {
+}, function(a) {
+    a.hideAddressbar = function(g) {
+        g = "string" == typeof g ? document.querySelector(g) : g;
+        var b = navigator.userAgent, i = ~b.indexOf("iPhone") || ~b.indexOf("iPod"), k = ~b.indexOf("iPad"), f = i || k, e = ~b.indexOf("Android"), j = a.navigator.standalone, c = 0;
+        if ((f || e) && g) {
+            e && a.addEventListener("scroll", function() {
+                g.style.height = a.innerHeight + "px";
+            }, !1);
+            var h = function() {
+                var l = 0;
+                f ? (l = document.documentElement.clientHeight, i && !j && (l += 60)) : e && (l = a.innerHeight + 56), 
+                g.style.height = l + "px", setTimeout(scrollTo, 0, 0, 1);
+            };
+            !function d() {
+                var l = g.offsetWidth;
+                c !== l && (c = l, h(), a.addEventListener("resize", d, !1));
+            }();
+        }
+    };
+}(this), function() {
     var initializing = !1, fnTest = /xyz/.test(function() {
         xyz;
     }) ? /\b_super\b/ : /.*/;

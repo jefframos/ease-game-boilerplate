@@ -23,8 +23,33 @@ var WaitScreen = AbstractScreen.extend({
         }else{
             this.onAssetsLoaded();
         }
-
-        
+        this.textAcc = new PIXI.Text('Acc', {font:'20px Arial'});
+        this.addChild(this.textAcc);
+        this.textAcc.position.y = 50;
+        this.textAcc.position.x = 50;
+        this.accelerometer = {};
+        var self = this;
+        function motion(event){
+            if(event.accelerationIncludingGravity.x === null)
+            {
+                return;
+            }
+            
+            self.accelerometer.x = parseFloat(event.accelerationIncludingGravity.x.toFixed(2))/10;
+            self.accelerometer.y = parseFloat(event.accelerationIncludingGravity.y.toFixed(2))/10;
+            self.accelerometer.z = parseFloat(event.accelerationIncludingGravity.z.toFixed(2))/10;
+            self.red.velocity.y = (self.accelerometer.y + 0.5) * 5 * -1;
+            self.textAcc.setText('Accelerometer: \n'+self.accelerometer.x + '\n, '+
+                self.accelerometer.y + '\n, '+
+                self.accelerometer.z);
+            // console.log('Accelerometer: '+event.accelerationIncludingGravity.x + ', '+event.accelerationIncludingGravity.y + ', '+event.accelerationIncludingGravity.z);
+        }
+        if(window.DeviceMotionEvent){
+            window.addEventListener('devicemotion', motion, false);
+        }else{
+            alert('DeviceMotionEvent is not supported');
+        }
+            
     },
     onProgress:function(){
         this._super();
@@ -36,10 +61,10 @@ var WaitScreen = AbstractScreen.extend({
     initApplication:function(){
         this.easeImg = new SimpleSprite('_dist/img/ease.png');
         this.addChild(this.easeImg);
-        this.easeImg.setPosition(50,50);
+        this.easeImg.setPosition(windowWidth / 2 - this.easeImg.getContent().width / 2, 50);
 
         this.red = new Red();
-        this.red.build();
+        this.red.build(this);
         this.addChild(this.red);
         this.red.setPosition(windowWidth / 2, windowHeight / 2);
 
@@ -53,18 +78,9 @@ var WaitScreen = AbstractScreen.extend({
             self.red.spritesheet.play('hurt');
         };
 
-        this.fullScreen = new DefaultButton('_dist/img/UI/simpleButtonUp.png', '_dist/img/UI/simpleButtonOver.png');
-        this.fullScreen.build(130);
-        this.fullScreen.setPosition( 50,windowHeight/2 + 120);
-        this.addChild(this.fullScreen);
-        this.fullScreen.addLabel(new PIXI.Text('Full Screen', {font:'20px Arial'}),5,5);
-        this.fullScreen.clickCallback = function(){
-            fullscreen();
-        };
-
         this.add = new DefaultButton('_dist/img/UI/simpleButtonUp.png', '_dist/img/UI/simpleButtonOver.png');
         this.add.build(130);
-        this.add.setPosition( 50,windowHeight/2 + 180);
+        this.add.setPosition( 50,windowHeight/2 + 120);
         this.addChild(this.add);
         this.add.addLabel(new PIXI.Text('Add Entity', {font:'20px Arial'}),5,5);
         this.add.clickCallback = function(){
@@ -75,5 +91,16 @@ var WaitScreen = AbstractScreen.extend({
             red.velocity.x = 1;
             // fullscreen();
         };
+
+        if(possibleFullscreen()){
+            this.fullScreen = new DefaultButton('_dist/img/UI/simpleButtonUp.png', '_dist/img/UI/simpleButtonOver.png');
+            this.fullScreen.build(130);
+            this.fullScreen.setPosition( 50,windowHeight/2 + 180);
+            this.addChild(this.fullScreen);
+            this.fullScreen.addLabel(new PIXI.Text('Full Screen', {font:'20px Arial'}),5,5);
+            this.fullScreen.clickCallback = function(){
+                fullscreen();
+            };
+        }
     }
 });

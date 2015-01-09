@@ -24,12 +24,13 @@ var renderer = PIXI.autoDetectRenderer(realWindowWidth, realWindowHeight, null, 
 
 document.body.appendChild(renderer.view);
 
+renderer.view.style.width = windowWidth+'px';
+renderer.view.style.height = windowHeight+'px';
+
 var APP;
 APP = new Application();
 APP.build();
 APP.show();
-
-console.log(Modernizr);
 
 function update() {
 	requestAnimFrame(update );
@@ -50,20 +51,27 @@ function update() {
 	renderer.view.style.width = windowWidthVar+'px';
 	renderer.view.style.height = windowHeightVar+'px';
 
+	
 	APP.update();
 	renderer.render(APP.stage);
 	meter.tick();
 }
 
+
+
 var initialize = function(){
 	// //inicia o game e da um build
-	PIXI.BaseTexture.SCALE_MODE = 2;
+	// PIXI.BaseTexture.SCALE_MODE = PIXI.scaleModes.NEAREST;//2;
 	requestAnimFrame(update);
 };
 
+function possibleFullscreen(){
+	var elem = renderer.view;
+	return  elem.requestFullscreen || elem.msRequestFullscreen || elem.mozRequestFullScreen || elem.webkitRequestFullscreen;
+}
 function fullscreen(){
 
-	var elem = renderer.view;//document.getElementById('myvideo');
+	var elem = renderer.view;
 	if (elem.requestFullscreen) {
 		elem.requestFullscreen();
 	} else if (elem.msRequestFullscreen) {
@@ -82,6 +90,7 @@ function fullscreen(){
 	var App = {
 		init: function () {
 			initialize();
+
 		}
 	};
 	App.init();

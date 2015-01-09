@@ -1,4 +1,4 @@
-/*! jefframos 08-01-2015 */
+/*! jefframos 09-01-2015 */
 function rgbToHsl(r, g, b) {
     r /= 255, g /= 255, b /= 255;
     var h, s, max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
@@ -88,6 +88,11 @@ function update() {
     windowWidthVar > realWindowWidth && (windowWidthVar = realWindowWidth), windowHeightVar > realWindowHeight && (windowHeightVar = realWindowHeight), 
     renderer.view.style.width = windowWidthVar + "px", renderer.view.style.height = windowHeightVar + "px", 
     APP.update(), renderer.render(APP.stage), meter.tick();
+}
+
+function possibleFullscreen() {
+    var elem = renderer.view;
+    return elem.requestFullscreen || elem.msRequestFullscreen || elem.mozRequestFullScreen || elem.webkitRequestFullscreen;
 }
 
 function fullscreen() {
@@ -332,16 +337,18 @@ var Application = AbstractApplication.extend({
     init: function() {
         this._super(!0);
     },
-    build: function() {
+    build: function(screen) {
         var self = this, motionIdle = new SpritesheetAnimation();
         motionIdle.build("idle", this.getFramesByRange("red0", 1, 26), 1, !0, null);
         var motionHurt = new SpritesheetAnimation();
         motionHurt.build("hurt", this.getFramesByRange("red0", 28, 43), 1, !1, function() {
             self.spritesheet.play("idle");
         }), this.spritesheet = new Spritesheet(), this.spritesheet.addAnimation(motionIdle), 
-        this.spritesheet.addAnimation(motionHurt), this.spritesheet.play("idle");
+        this.spritesheet.addAnimation(motionHurt), this.spritesheet.play("idle"), this.screen = screen, 
+        this.defaultVel = 50;
     },
     update: function() {
+        this.getPosition().y > windowHeight && this.velocity.y > 0 ? this.velocity.y = 0 : this.getPosition().y < 0 && this.velocity.y < 0 && (this.velocity.y = 0), 
         this._super(), this.getPosition().x > windowWidth && this.preKill();
     },
     destroy: function() {
@@ -362,10 +369,21 @@ var Application = AbstractApplication.extend({
         this._super();
     },
     build: function() {
+        function motion(event) {
+            null !== event.accelerationIncludingGravity.x && (self.accelerometer.x = parseFloat(event.accelerationIncludingGravity.x.toFixed(2)) / 10, 
+            self.accelerometer.y = parseFloat(event.accelerationIncludingGravity.y.toFixed(2)) / 10, 
+            self.accelerometer.z = parseFloat(event.accelerationIncludingGravity.z.toFixed(2)) / 10, 
+            self.red.velocity.y = 5 * (self.accelerometer.y + .5) * -1, self.textAcc.setText("Accelerometer: \n" + self.accelerometer.x + "\n, " + self.accelerometer.y + "\n, " + self.accelerometer.z));
+        }
         this._super();
         var assetsToLoader = [ "_dist/img/ease.png", "_dist/img/UI/simpleButtonOver.png", "_dist/img/spritesheet/red/red.json", "_dist/img/UI/simpleButtonUp.png" ];
         assetsToLoader.length > 0 ? (this.loader = new PIXI.AssetLoader(assetsToLoader), 
-        this.initLoad()) : this.onAssetsLoaded();
+        this.initLoad()) : this.onAssetsLoaded(), this.textAcc = new PIXI.Text("Acc", {
+            font: "20px Arial"
+        }), this.addChild(this.textAcc), this.textAcc.position.y = 50, this.textAcc.position.x = 50, 
+        this.accelerometer = {};
+        var self = this;
+        window.DeviceMotionEvent ? window.addEventListener("devicemotion", motion, !1) : alert("DeviceMotionEvent is not supported");
     },
     onProgress: function() {
         this._super();
@@ -375,8 +393,8 @@ var Application = AbstractApplication.extend({
     },
     initApplication: function() {
         this.easeImg = new SimpleSprite("_dist/img/ease.png"), this.addChild(this.easeImg), 
-        this.easeImg.setPosition(50, 50), this.red = new Red(), this.red.build(), this.addChild(this.red), 
-        this.red.setPosition(windowWidth / 2, windowHeight / 2);
+        this.easeImg.setPosition(windowWidth / 2 - this.easeImg.getContent().width / 2, 50), 
+        this.red = new Red(), this.red.build(this), this.addChild(this.red), this.red.setPosition(windowWidth / 2, windowHeight / 2);
         var self = this;
         this.buttonHurt = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
         this.buttonHurt.build(130), this.buttonHurt.setPosition(50, windowHeight / 2 + 60), 
@@ -384,21 +402,21 @@ var Application = AbstractApplication.extend({
             font: "20px Arial"
         }), 5, 5), this.buttonHurt.clickCallback = function() {
             self.red.spritesheet.play("hurt");
-        }, this.fullScreen = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
-        this.fullScreen.build(130), this.fullScreen.setPosition(50, windowHeight / 2 + 120), 
-        this.addChild(this.fullScreen), this.fullScreen.addLabel(new PIXI.Text("Full Screen", {
-            font: "20px Arial"
-        }), 5, 5), this.fullScreen.clickCallback = function() {
-            fullscreen();
         }, this.add = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
-        this.add.build(130), this.add.setPosition(50, windowHeight / 2 + 180), this.addChild(this.add), 
+        this.add.build(130), this.add.setPosition(50, windowHeight / 2 + 120), this.addChild(this.add), 
         this.add.addLabel(new PIXI.Text("Add Entity", {
             font: "20px Arial"
         }), 5, 5), this.add.clickCallback = function() {
             var red = new Red();
             red.build(), red.setPosition(0, windowHeight * Math.random()), self.addChild(red), 
             red.velocity.x = 1;
-        };
+        }, possibleFullscreen() && (this.fullScreen = new DefaultButton("_dist/img/UI/simpleButtonUp.png", "_dist/img/UI/simpleButtonOver.png"), 
+        this.fullScreen.build(130), this.fullScreen.setPosition(50, windowHeight / 2 + 180), 
+        this.addChild(this.fullScreen), this.fullScreen.addLabel(new PIXI.Text("Full Screen", {
+            font: "20px Arial"
+        }), 5, 5), this.fullScreen.clickCallback = function() {
+            fullscreen();
+        });
     }
 }), FirebaseSocket = SmartSocket.extend({
     init: function(url) {
@@ -468,14 +486,15 @@ realWindowWidth = windowWidth, realWindowHeight = windowHeight);
 
 var renderer, windowWidthVar = window.innerWidth, windowHeightVar = window.innerHeight, renderer = PIXI.autoDetectRenderer(realWindowWidth, realWindowHeight, null, !1, !0);
 
-document.body.appendChild(renderer.view);
+document.body.appendChild(renderer.view), renderer.view.style.width = windowWidth + "px", 
+renderer.view.style.height = windowHeight + "px";
 
 var APP;
 
-APP = new Application(), APP.build(), APP.show(), console.log(Modernizr);
+APP = new Application(), APP.build(), APP.show();
 
 var initialize = function() {
-    PIXI.BaseTexture.SCALE_MODE = 2, requestAnimFrame(update);
+    requestAnimFrame(update);
 };
 
 !function() {
